@@ -6,8 +6,8 @@ import './App.css'
 import ModernLogisticsHomepage from './pages/main';
 import AdminDashboard from './pages/admin';
 import LogisticsForm from './pages/logisticsform';
-import Navbar from './componets/Navbar'
 import Footer from './componets/Footer';
+import Navbar from './componets/navbar';
 
 function App() {
 
