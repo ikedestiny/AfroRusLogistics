@@ -3,11 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 
 import './App.css'
-import LogisticsHomepage from './pages/main';
 import ModernLogisticsHomepage from './pages/main';
 import AdminDashboard from './pages/admin';
 import LogisticsForm from './pages/logisticsform';
-import Navbar from './componets/navbar';
+import Navbar from './componets/Navbar'
 import Footer from './componets/Footer';
 
 function App() {
