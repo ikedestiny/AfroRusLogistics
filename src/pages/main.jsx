@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Navbar from '../componets/navbar';
 
 const ModernLogisticsHomepage = () => {
     const [activeTab, setActiveTab] = useState('all');

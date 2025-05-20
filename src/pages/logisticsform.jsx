@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Navbar from '../componets/navbar';
 const LogisticsForm = ({ userType }) => {
     const [formData, setFormData] = useState({
         type: 'documents',
