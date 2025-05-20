@@ -7,7 +7,7 @@ import ModernLogisticsHomepage from './pages/main';
 import AdminDashboard from './pages/admin';
 import LogisticsForm from './pages/logisticsform';
 import Footer from './componets/Footer';
-import Navbar from './componets/navbar';
+import Navbar from './componets/Navbar';
 
 function App() {
 
