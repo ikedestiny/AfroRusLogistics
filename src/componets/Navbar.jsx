@@ -24,7 +24,7 @@ const Navbar = () => {
                             Home
                         </Link>
                         <Link
-                            to="/form"
+                            to="/request"
                             className="px-2 py-1 text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium"
                         >
                             Request
