@@ -7,11 +7,19 @@ const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row justify-between items-center py-4">
                     <div className="text-center md:text-left mb-3 md:mb-0">
-                        <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
-                            <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-1 tracking-tight">
-                                <span className="font-medium">RUS</span>↔<span className="font-medium">NGA</span>
-                            </h1>
-                            <p className="text-neutral-500 text-xs md:text-sm">Efficient Russia-Nigeria logistics</p>
+                        <Link to="/" className="flex items-center hover:opacity-90 transition-opacity">
+                            {/* Logo added here */}
+                            <img
+                                src="/logo.png"
+                                alt="RUS-NGA Logo"
+                                className="h-20  mr-3"
+                            />
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-1 tracking-tight">
+                                    <span className="font-medium">NAIJA</span>↔<span className="font-medium">RUSHH</span>
+                                </h1>
+                                <p className="text-neutral-500 text-xs md:text-sm">Efficient Russia-Nigeria logistics</p>
+                            </div>
                         </Link>
                     </div>
 
@@ -36,10 +44,10 @@ const Navbar = () => {
                             Offer
                         </Link>
                         <Link
-                            to="/track"
+                            to="/auth"
                             className="px-2 py-1 text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium"
                         >
-                            Track
+                            Login
                         </Link>
                         <Link
                             to="/contact"

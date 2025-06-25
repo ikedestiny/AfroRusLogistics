@@ -10,6 +10,7 @@ import Navbar from './componets/Navbar';
 import ClientLogisticsForm from './pages/requestForm';
 import ProviderLogisticsForm from './pages/providerForm';
 import AuthPage from './pages/Authpage';
+import VerificationCode from './pages/VerificationCode';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/form" element={<ProviderLogisticsForm />} />
           <Route path="/request" element={<ClientLogisticsForm />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path='/verify-email' element={<VerificationCode />} />
         </Routes>  </main>
       <Footer />
     </div>
