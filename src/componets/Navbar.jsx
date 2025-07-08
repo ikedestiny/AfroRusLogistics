@@ -35,13 +35,13 @@ const Navbar = () => {
                             to="/request"
                             className="px-2 py-1 text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium"
                         >
-                            Request
+                            Need Space
                         </Link>
                         <Link
                             to="/form"
                             className="px-2 py-1 text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium"
                         >
-                            Offer
+                            Have Space
                         </Link>
                         <Link
                             to="/auth"

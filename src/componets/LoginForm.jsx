@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { authStore } from '../state/authStore';
 import GoogleLoginButton from './GoogleLoginButton';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
     const {
@@ -16,6 +17,7 @@ const LoginForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [authError, setError] = useState(null);
+    const navigate = useNavigate();
 
     // Combine store errors and local errors
     useEffect(() => {
@@ -55,9 +57,13 @@ const LoginForm = () => {
         setError(null);
         try {
             await loginUser();
+            if (!error) {
+                navigate("/")
+            }
         } catch (err) {
             // Error is already handled in the store
             setError(err)
+            alert(err)
         } finally {
             setIsLoading(false);
         }

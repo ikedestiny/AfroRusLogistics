@@ -17,6 +17,7 @@ export const authStore = create((set, get) => ({
     setUsername: (name) => set({ username: name }),
     setPassword: (word) => set({ password: word }),
     setEmail: (email) => set({ email: email }),
+    clearError: () => set({ error: "" }),
 
     registerUser: async () => {
         const { username, password, email } = get();
@@ -112,7 +113,6 @@ export const authStore = create((set, get) => ({
 
         try {
             const res = await API.loginUser({ email, password });
-            console.log("verification code sent to :", email);
             set({ password: "", name: "", token: res });
             localStorage.setItem("storedToken", res)
         } catch (err) {

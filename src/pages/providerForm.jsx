@@ -1,9 +1,35 @@
 import { useState } from 'react';
 
 const ProviderLogisticsForm = () => {
+    // Nigerian state capitals
+    const nigerianCities = [
+        'Abuja', 'Abeokuta', 'Ado Ekiti', 'Akure', 'Asaba', 'Awka', 'Bauchi',
+        'Benin City', 'Birnin Kebbi', 'Calabar', 'Dutse', 'Enugu', 'Gombe',
+        'Gusau', 'Ibadan', 'Ikeja', 'Ilorin', 'Jalingo', 'Jos', 'Kaduna',
+        'Kano', 'Katsina', 'Lafia', 'Lokoja', 'Maiduguri', 'Makurdi', 'Minna',
+        'Ogbomosho', 'Ondo', 'Onitsha', 'Osogbo', 'Owerri', 'Port Harcourt',
+        'Sokoto', 'Umuahia', 'Uyo', 'Warri', 'Yenagoa', 'Yola', 'Zaria'
+    ];
+
+    // Major Russian cities
+    const russianCities = [
+        'Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan',
+        'Nizhny Novgorod', 'Chelyabinsk', 'Samara', 'Omsk', 'Rostov-on-Don',
+        'Ufa', 'Krasnoyarsk', 'Perm', 'Voronezh', 'Volgograd', 'Krasnodar',
+        'Saratov', 'Tyumen', 'Tolyatti', 'Izhevsk', 'Barnaul', 'Ulyanovsk',
+        'Irkutsk', 'Khabarovsk', 'Yaroslavl', 'Vladivostok', 'Makhachkala',
+        'Tomsk', 'Orenburg', 'Kemerovo', 'Novokuznetsk', 'Ryazan', 'Astrakhan',
+        'Naberezhnye Chelny', 'Sochi', 'Penza', 'Lipetsk', 'Kirov', 'Cheboksary',
+        'Tula', 'Kaliningrad', 'Balashikha', 'Kursk', 'Stavropol', 'Ulan-Ude',
+        'Bryansk', 'Ivanovo', 'Magnitogorsk', 'Tver', 'Belgorod', 'Arkhangelsk'
+    ];
+
     const [formData, setFormData] = useState({
         type: 'documents',
-        direction: 'russia-nigeria',
+        originCountry: 'russia',
+        originCity: 'Moscow',
+        destinationCountry: 'nigeria',
+        destinationCity: 'Abuja',
         departureDate: '',
         weight: '',
         description: '',
@@ -11,23 +37,14 @@ const ProviderLogisticsForm = () => {
         contactEmail: '',
         contactPhone: '',
         companyName: '',
-        availableRoutes: [],
         serviceType: 'standard'
     });
 
     const [submissionStatus, setSubmissionStatus] = useState(null);
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-
-        if (type === 'checkbox') {
-            const updatedRoutes = checked
-                ? [...formData.availableRoutes, value]
-                : formData.availableRoutes.filter(route => route !== value);
-            setFormData(prev => ({ ...prev, availableRoutes: updatedRoutes }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = (e) => {
@@ -63,19 +80,96 @@ const ProviderLogisticsForm = () => {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="direction" className="block mb-1">Direction</label>
+                        <label htmlFor="serviceType" className="block mb-1">Service Type</label>
                         <select
-                            id="direction"
-                            name="direction"
-                            value={formData.direction}
+                            id="serviceType"
+                            name="serviceType"
+                            value={formData.serviceType}
                             onChange={handleChange}
-                            required
                             className="w-full border px-4 py-2 rounded"
                         >
-                            <option value="russia-nigeria">Russia → Nigeria</option>
-                            <option value="nigeria-russia">Nigeria → Russia</option>
-                            <option value="both">Both</option>
+                            <option value="standard">Standard</option>
+                            <option value="express">Express</option>
+                            <option value="premium">Premium</option>
                         </select>
+                    </div>
+                </div>
+
+                <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium mb-4">Route Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label htmlFor="originCountry" className="block mb-1">Origin Country</label>
+                            <select
+                                id="originCountry"
+                                name="originCountry"
+                                value={formData.originCountry}
+                                onChange={handleChange}
+                                required
+                                className="w-full border px-4 py-2 rounded"
+                            >
+                                <option value="russia">Russia</option>
+                                <option value="nigeria">Nigeria</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="originCity" className="block mb-1">Origin City</label>
+                            <select
+                                id="originCity"
+                                name="originCity"
+                                value={formData.originCity}
+                                onChange={handleChange}
+                                required
+                                className="w-full border px-4 py-2 rounded"
+                            >
+                                {formData.originCountry === 'russia' ? (
+                                    russianCities.map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))
+                                ) : (
+                                    nigerianCities.map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))
+                                )}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label htmlFor="destinationCountry" className="block mb-1">Destination Country</label>
+                            <select
+                                id="destinationCountry"
+                                name="destinationCountry"
+                                value={formData.destinationCountry}
+                                onChange={handleChange}
+                                required
+                                className="w-full border px-4 py-2 rounded"
+                            >
+                                <option value="russia">Russia</option>
+                                <option value="nigeria">Nigeria</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="destinationCity" className="block mb-1">Destination City</label>
+                            <select
+                                id="destinationCity"
+                                name="destinationCity"
+                                value={formData.destinationCity}
+                                onChange={handleChange}
+                                required
+                                className="w-full border px-4 py-2 rounded"
+                            >
+                                {formData.destinationCountry === 'russia' ? (
+                                    russianCities.map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))
+                                ) : (
+                                    nigerianCities.map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))
+                                )}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -123,39 +217,6 @@ const ProviderLogisticsForm = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-2">Available Routes</label>
-                    {['russia-nigeria', 'nigeria-russia'].map((route) => (
-                        <div key={route} className="flex items-center">
-                            <input
-                                id={`route-${route}`}
-                                type="checkbox"
-                                name="availableRoutes"
-                                value={route}
-                                checked={formData.availableRoutes.includes(route)}
-                                onChange={handleChange}
-                                className="mr-2"
-                            />
-                            <label htmlFor={`route-${route}`}>{route.replace('-', ' → ')}</label>
-                        </div>
-                    ))}
-                </div>
-
-                <div>
-                    <label htmlFor="serviceType" className="block mb-1">Service Type</label>
-                    <select
-                        id="serviceType"
-                        name="serviceType"
-                        value={formData.serviceType}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    >
-                        <option value="standard">Standard</option>
-                        <option value="express">Express</option>
-                        <option value="premium">Premium</option>
-                    </select>
-                </div>
-
-                <div>
                     <label htmlFor="description" className="block mb-1">Service Description</label>
                     <textarea
                         id="description"
@@ -167,48 +228,7 @@ const ProviderLogisticsForm = () => {
                     />
                 </div>
 
-                <div className="border-t pt-6">
-                    <h3 className="text-lg font-medium mb-4">Contact Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label htmlFor="contactName" className="block mb-1">Full Name</label>
-                            <input
-                                id="contactName"
-                                type="text"
-                                name="contactName"
-                                value={formData.contactName}
-                                onChange={handleChange}
-                                required
-                                className="w-full border px-4 py-2 rounded"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="contactEmail" className="block mb-1">Email Address</label>
-                            <input
-                                id="contactEmail"
-                                type="email"
-                                name="contactEmail"
-                                value={formData.contactEmail}
-                                onChange={handleChange}
-                                required
-                                className="w-full border px-4 py-2 rounded"
-                            />
-                        </div>
-                    </div>
-                    <div className="mt-6">
-                        <label htmlFor="contactPhone" className="block mb-1">Phone Number</label>
-                        <input
-                            id="contactPhone"
-                            type="tel"
-                            name="contactPhone"
-                            value={formData.contactPhone}
-                            onChange={handleChange}
-                            required
-                            placeholder="e.g. +234..."
-                            className="w-full border px-4 py-2 rounded"
-                        />
-                    </div>
-                </div>
+
 
                 <div className="flex justify-end pt-6">
                     <button
