@@ -1,63 +1,119 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { spaceStore } from '../state/spaceStore';
 
 const ModernLogisticsHomepage = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [direction, setDirection] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [slots, setSlots] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Sample data
-    const waybillSlots = [
-        {
-            id: 1,
-            type: 'documents',
-            direction: 'russia-nigeria',
-            departureDate: '2023-11-15',
-            availableSpace: '3kg',
-            status: 'available',
-            contact: 'contact@example.com'
-        },
-        {
-            id: 2,
-            type: 'goods',
-            direction: 'nigeria-russia',
-            departureDate: '2023-11-18',
-            availableSpace: '15kg',
-            status: 'available',
-            contact: 'contact@example.com'
-        },
-        {
-            id: 3,
-            type: 'documents',
-            direction: 'russia-nigeria',
-            departureDate: '2023-11-20',
-            availableSpace: '5kg',
-            status: 'looking',
-            contact: 'contact@example.com'
-        },
-        {
-            id: 4,
-            type: 'goods',
-            direction: 'nigeria-russia',
-            departureDate: '2023-11-22',
-            availableSpace: '25kg',
-            status: 'available',
-            contact: 'contact@example.com'
-        },
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const { all, fetchAll } = spaceStore.getState();
+
+                if (!all || all.length === 0) {
+                    await fetchAll();
+                }
+
+                // Transform the API data to match your frontend structure
+                const formattedSlots = spaceStore.getState().all.map(slot => ({
+                    id: slot.id,
+                    type: slot.type === 'DOCUMENT_AVAILABLE' ? 'documents' : 'goods',
+                    direction: `${slot.departureCity} → ${slot.arrivalCity}`,
+                    departureDate: slot.availableFrom || new Date().toISOString(),
+                    availableSpace: slot.weightKg ? `${slot.weightKg}kg` : 'Flexible',
+                    status: slot.type.includes('AVAILABLE') ? 'available' : 'looking',
+                    contact: slot.userId || 'N/A',
+                    verified: slot.verifiedUser || false,
+                    rawData: slot // Keep original data for reference
+                }));
+
+                setSlots(formattedSlots);
+            } catch (error) {
+                console.error('Error loading data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
+
+    // Nigerian state capitals
+    const nigerianCities = [
+        'Abuja', 'Abeokuta', 'Ado Ekiti', 'Akure', 'Asaba', 'Awka', 'Bauchi',
+        'Benin City', 'Birnin Kebbi', 'Calabar', 'Dutse', 'Enugu', 'Gombe',
+        'Gusau', 'Ibadan', 'Ikeja', 'Ilorin', 'Jalingo', 'Jos', 'Kaduna',
+        'Kano', 'Katsina', 'Lafia', 'Lokoja', 'Maiduguri', 'Makurdi', 'Minna',
+        'Ogbomosho', 'Ondo', 'Onitsha', 'Osogbo', 'Owerri', 'Port Harcourt',
+        'Sokoto', 'Umuahia', 'Uyo', 'Warri', 'Yenagoa', 'Yola', 'Zaria'
     ];
 
-    const filteredSlots = waybillSlots.filter(slot => {
+    // Major Russian cities
+    const russianCities = [
+        'Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan',
+        'Nizhny Novgorod', 'Chelyabinsk', 'Samara', 'Omsk', 'Rostov-on-Don',
+        'Ufa', 'Krasnoyarsk', 'Perm', 'Voronezh', 'Volgograd', 'Krasnodar',
+        'Saratov', 'Tyumen', 'Tolyatti', 'Izhevsk', 'Barnaul', 'Ulyanovsk',
+        'Irkutsk', 'Khabarovsk', 'Yaroslavl', 'Vladivostok', 'Makhachkala',
+        'Tomsk', 'Orenburg', 'Kemerovo', 'Novokuznetsk', 'Ryazan', 'Astrakhan',
+        'Naberezhnye Chelny', 'Sochi', 'Penza', 'Lipetsk', 'Kirov', 'Cheboksary',
+        'Tula', 'Kaliningrad', 'Balashikha', 'Kursk', 'Stavropol', 'Ulan-Ude',
+        'Bryansk', 'Ivanovo', 'Magnitogorsk', 'Tver', 'Belgorod', 'Arkhangelsk'
+    ];
+
+    const filteredSlots = slots.filter(slot => {
         const typeMatch = activeTab === 'all' || slot.type === activeTab;
-        const directionMatch = direction === 'all' || slot.direction === direction;
         const statusMatch = statusFilter === 'all' || slot.status === statusFilter;
+
+        // Skip direction filtering if 'all' is selected
+        if (direction === 'all') {
+            return typeMatch && statusMatch;
+        }
+
+        // Extract city and country information
+        const departureCity = slot.rawData.departureCity?.toLowerCase();
+        const arrivalCity = slot.rawData.arrivalCity?.toLowerCase();
+
+        // Determine country based on city lists
+        const isDepartureNigeria = nigerianCities.some(city =>
+            city.toLowerCase() === departureCity
+        );
+        const isDepartureRussia = russianCities.some(city =>
+            city.toLowerCase() === departureCity
+        );
+        const isArrivalNigeria = nigerianCities.some(city =>
+            city.toLowerCase() === arrivalCity
+        );
+        const isArrivalRussia = russianCities.some(city =>
+            city.toLowerCase() === arrivalCity
+        );
+
+        // Handle direction filtering
+        let directionMatch = false;
+        if (direction === 'russia-nigeria') {
+            directionMatch = (isDepartureRussia && isArrivalNigeria) ||
+                (departureCity === 'russia' && arrivalCity === 'nigeria');
+        } else if (direction === 'nigeria-russia') {
+            directionMatch = (isDepartureNigeria && isArrivalRussia) ||
+                (departureCity === 'nigeria' && arrivalCity === 'russia');
+        }
+
         return typeMatch && directionMatch && statusMatch;
     });
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading slots...</div>;
+    }
 
     return (
         <div className="min-h-screen bg-neutral-50 p-4 md:p-8 font-sans">
             <div className="max-w-7xl mx-auto">
                 {/* Filters - Three-tier system */}
                 <div className="mb-12 space-y-4">
-                    {/* Status filters (new) */}
+                    {/* Status filters */}
                     <div className="flex flex-wrap justify-center gap-2">
                         {['all', 'available', 'looking'].map((status) => (
                             <button
@@ -131,12 +187,7 @@ const ModernLogisticsHomepage = () => {
 
                                     <div className="mb-4 flex-grow">
                                         <h3 className="text-xl font-light mb-3">
-                                            {slot.direction.split('-').map((city, i) => (
-                                                <span key={city}>
-                                                    {i > 0 && <span className="mx-1">→</span>}
-                                                    <span className="font-medium">{city === 'russia' ? 'RU' : 'NG'}</span>
-                                                </span>
-                                            ))}
+                                            {slot.direction}
                                         </h3>
 
                                         <div className="space-y-2 text-sm text-neutral-600">
@@ -154,6 +205,12 @@ const ModernLogisticsHomepage = () => {
                                                 <span>Capacity</span>
                                                 <span className="font-medium">{slot.availableSpace}</span>
                                             </div>
+                                            {slot.verified && (
+                                                <div className="flex justify-between">
+                                                    <span>Verified</span>
+                                                    <span className="font-medium">✓</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

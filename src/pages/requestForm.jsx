@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { spaceStore } from '../state/spaceStore';
 
 const ClientLogisticsForm = () => {
     // Nigerian state capitals
@@ -24,43 +25,77 @@ const ClientLogisticsForm = () => {
         'Bryansk', 'Ivanovo', 'Magnitogorsk', 'Tver', 'Belgorod', 'Arkhangelsk'
     ];
 
+    const { addNeededSpaceForDoc, addNeededSpaceForLoad } = spaceStore.getState();
+
     const [formData, setFormData] = useState({
-        type: 'documents',
-        originCountry: 'russia',
-        originCity: 'Moscow',
-        destinationCountry: 'nigeria',
-        destinationCity: 'Abuja',
+        departureCountry: '',
+        departureCity: '',
+        arrivalCountry: '',
+        arrivalCity: '',
         departureDate: '',
-        weight: '',
+        weightKg: '',
         description: '',
-        contactName: '',
-        contactEmail: '',
-        contactPhone: '',
-        serviceType: 'standard'
+        serviceType: 'standard',
+        type: 'documents'
     });
 
     const [submissionStatus, setSubmissionStatus] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Client form submitted:', formData);
-        setSubmissionStatus('success');
-        setTimeout(() => setSubmissionStatus(null), 3000);
+        setIsLoading(true);
+
+        try {
+            if (formData.type === 'documents') {
+                await addNeededSpaceForDoc(formData);
+            } else {
+                await addNeededSpaceForLoad(formData);
+            }
+
+            setSubmissionStatus('success');
+            // Reset form after successful submission
+            setFormData({
+                departureCountry: '',
+                departureCity: '',
+                arrivalCountry: '',
+                arrivalCity: '',
+                departureDate: '',
+                weightKg: '',
+                description: '',
+                serviceType: 'standard',
+                type: 'documents'
+            });
+        } catch (error) {
+            setSubmissionStatus('error');
+            console.error('Submission error:', error);
+        } finally {
+            setIsLoading(false);
+            setTimeout(() => setSubmissionStatus(null), 3000);
+        }
     };
 
     return (
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Request Logistics Service</h2>
+
             {submissionStatus === 'success' && (
                 <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-md">
                     Your logistics request has been submitted successfully!
                 </div>
             )}
+
+            {submissionStatus === 'error' && (
+                <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-md">
+                    There was an error submitting your request. Please try again.
+                </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -98,75 +133,81 @@ const ClientLogisticsForm = () => {
                     <h3 className="text-lg font-medium mb-4">Route Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="originCountry" className="block mb-1">Origin Country</label>
+                            <label htmlFor="departureCountry" className="block mb-1">Departure Country</label>
                             <select
-                                id="originCountry"
-                                name="originCountry"
-                                value={formData.originCountry}
+                                id="departureCountry"
+                                name="departureCountry"
+                                value={formData.departureCountry}
                                 onChange={handleChange}
                                 required
                                 className="w-full border px-4 py-2 rounded"
                             >
+                                <option value="">Select country</option>
                                 <option value="russia">Russia</option>
                                 <option value="nigeria">Nigeria</option>
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="originCity" className="block mb-1">Origin City</label>
+                            <label htmlFor="departureCity" className="block mb-1">Departure City</label>
                             <select
-                                id="originCity"
-                                name="originCity"
-                                value={formData.originCity}
+                                id="departureCity"
+                                name="departureCity"
+                                value={formData.departureCity}
                                 onChange={handleChange}
                                 required
                                 className="w-full border px-4 py-2 rounded"
+                                disabled={!formData.departureCountry}
                             >
-                                {formData.originCountry === 'russia' ? (
+                                <option value="">Select city</option>
+                                {formData.departureCountry === 'russia' ? (
                                     russianCities.map(city => (
                                         <option key={city} value={city}>{city}</option>
                                     ))
-                                ) : (
+                                ) : formData.departureCountry === 'nigeria' ? (
                                     nigerianCities.map(city => (
                                         <option key={city} value={city}>{city}</option>
                                     ))
-                                )}
+                                ) : null}
                             </select>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label htmlFor="destinationCountry" className="block mb-1">Destination Country</label>
+                            <label htmlFor="arrivalCountry" className="block mb-1">Arrival Country</label>
                             <select
-                                id="destinationCountry"
-                                name="destinationCountry"
-                                value={formData.destinationCountry}
+                                id="arrivalCountry"
+                                name="arrivalCountry"
+                                value={formData.arrivalCountry}
                                 onChange={handleChange}
                                 required
                                 className="w-full border px-4 py-2 rounded"
                             >
+                                <option value="">Select country</option>
                                 <option value="russia">Russia</option>
                                 <option value="nigeria">Nigeria</option>
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="destinationCity" className="block mb-1">Destination City</label>
+                            <label htmlFor="arrivalCity" className="block mb-1">Arrival City</label>
                             <select
-                                id="destinationCity"
-                                name="destinationCity"
-                                value={formData.destinationCity}
+                                id="arrivalCity"
+                                name="arrivalCity"
+                                value={formData.arrivalCity}
                                 onChange={handleChange}
                                 required
                                 className="w-full border px-4 py-2 rounded"
+                                disabled={!formData.arrivalCountry}
                             >
-                                {formData.destinationCountry === 'russia' ? (
+                                <option value="">Select city</option>
+                                {formData.arrivalCountry === 'russia' ? (
                                     russianCities.map(city => (
                                         <option key={city} value={city}>{city}</option>
                                     ))
-                                ) : (
+                                ) : formData.arrivalCountry === 'nigeria' ? (
                                     nigerianCities.map(city => (
                                         <option key={city} value={city}>{city}</option>
                                     ))
-                                )}
+                                ) : null}
                             </select>
                         </div>
                     </div>
@@ -187,12 +228,12 @@ const ClientLogisticsForm = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="weight" className="block mb-1">Estimated Weight (kg)</label>
+                        <label htmlFor="weightKg" className="block mb-1">Estimated Weight (kg)</label>
                         <input
-                            id="weight"
+                            id="weightKg"
                             type="number"
-                            name="weight"
-                            value={formData.weight}
+                            name="weightKg"
+                            value={formData.weightKg}
                             onChange={handleChange}
                             required
                             min="0.1"
@@ -215,14 +256,13 @@ const ClientLogisticsForm = () => {
                     />
                 </div>
 
-
-
                 <div className="flex justify-end pt-6">
                     <button
                         type="submit"
-                        className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700"
+                        disabled={isLoading}
+                        className={`px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        Request Service
+                        {isLoading ? 'Submitting...' : 'Request Service'}
                     </button>
                 </div>
             </form>

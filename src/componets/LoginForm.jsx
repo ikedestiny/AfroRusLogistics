@@ -62,7 +62,7 @@ const LoginForm = () => {
             }
         } catch (err) {
             // Error is already handled in the store
-            setError(err)
+            setError("Login error")
             alert(err)
         } finally {
             setIsLoading(false);
